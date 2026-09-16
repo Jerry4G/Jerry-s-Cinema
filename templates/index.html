@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry's Cinema - Streaming de Films</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">🎬 Jerry's Cinema</div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Rechercher un film..." class="search-input">
+                <div id="searchResults" class="search-results hidden"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bienvenue sur MovieFlix</h1>
+            <p>Découvrez des milliers de films en streaming</p>
+        </div>
+    </section>
+
+    <!-- Tendances -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">📈 En Tendance</h2>
+            <div class="movies-grid">
+                {% for movie in trending %}
+                <div class="movie-card">
+                    {% if movie.poster_path %}
+                        <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster">
+                    {% else %}
+                        <div class="movie-placeholder">Pas d'image</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                        <div class="movie-rating">⭐ {{ "%.1f"|format(movie.rating) }}/10</div>
+                        <a href="/watch/{{ movie.id }}" class="btn-watch">Regarder</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Action -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🎬 Action</h2>
+            <div class="movies-grid">
+                {% for movie in action_movies %}
+                <div class="movie-card">
+                    {% if movie.poster_path %}
+                        <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster">
+                    {% else %}
+                        <div class="movie-placeholder">Pas d'image</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                        <div class="movie-rating">⭐ {{ "%.1f"|format(movie.rating) }}/10</div>
+                        <a href="/watch/{{ movie.id }}" class="btn-watch">Regarder</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Adventure -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🗺️ Aventure</h2>
+            <div class="movies-grid">
+                {% for movie in adventure_movies %}
+                <div class="movie-card">
+                    {% if movie.poster_path %}
+                        <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster">
+                    {% else %}
+                        <div class="movie-placeholder">Pas d'image</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                        <div class="movie-rating">⭐ {{ "%.1f"|format(movie.rating) }}/10</div>
+                        <a href="/watch/{{ movie.id }}" class="btn-watch">Regarder</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 MovieFlix. Powered by TMDB & Vidcore</p>
+        </div>
+    </footer>
+
+    <script>
+        // Barre de recherche
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', async function() {
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.results.length > 0) {
+                    searchResults.innerHTML = data.results.map(movie => `
+                        <div class="search-result-item">
+                            <a href="/watch/${movie.id}">
+                                ${movie.title} (${movie.release_date.split('-')[0]})
+                            </a>
+                        </div>
+                    `).join('');
+                    searchResults.classList.remove('hidden');
+                } else {
+                    searchResults.innerHTML = '<div class="search-result-item">Aucun résultat</div>';
+                    searchResults.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Erreur de recherche:', error);
+            }
+        });
+
+        // Fermer les résultats de recherche quand on clique ailleurs
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-bar')) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
