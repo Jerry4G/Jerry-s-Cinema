@@ -52,7 +52,18 @@
 <body class="watch-container">
     <!-- Navigation -->
     <script>
-        console.log("Jerry's Movies est ouvert ! ID : 42...");
+        // Bloquer les popups non désirés
+        window.open = function() {
+            console.warn('Popup bloqué');
+            return null;
+        };
+
+        // Bloquer les redirections forcées
+        Object.defineProperty(window.location, 'href', {
+            set: function(url) {
+                console.warn('Redirection bloquée vers :', url);
+            }
+        });
     </script>
     <nav class="navbar">
         <div class="container">
@@ -62,7 +73,6 @@
     </nav>
 
     <!-- Lecteur vidéo Vidcore -->
-    <script src="{{ url_for('static', filename='js/popup-blocker.js') }}"></script>
     <div class="video-player">
         <iframe 
             src="https://vidcore.org/embed/movie/{{ movie_id }}" 
