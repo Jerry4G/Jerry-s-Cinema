@@ -53,20 +53,6 @@
 </head>
 <body class="watch-container">
     <!-- Navigation -->
-    <script>
-        // Bloquer les popups non désirés
-        window.open = function() {
-            console.warn('Popup bloqué');
-            return null;
-        };
-
-        // Bloquer les redirections forcées
-        Object.defineProperty(window.location, 'href', {
-            set: function(url) {
-                console.warn('Redirection bloquée vers :', url);
-            }
-        });
-    </script>
     <nav class="navbar">
         <div class="container">
             <div class="logo">🎬 Jerry's Cinema</div>
