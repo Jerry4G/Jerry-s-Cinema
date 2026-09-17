@@ -62,6 +62,7 @@
     </nav>
 
     <!-- Lecteur vidéo Vidcore -->
+    <script src="{{ url_for('static', filename='js/popup-blocker.js') }}"></script>
     <div class="video-player">
         <iframe 
             src="https://vidcore.org/embed/movie/{{ movie_id }}" 
@@ -73,7 +74,6 @@
             style="border: none;">
         </iframe>
     </div>
-    <script src="{{ url_for('static', filename='js/popup-blocker.js') }}"></script>
 
     <!-- Infos du film -->
     <div class="watch-info">
