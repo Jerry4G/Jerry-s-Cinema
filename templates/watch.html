@@ -1,88 +1,152 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regarder - Jerry's Cinema</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .watch-container {
-            max-width: 100%;
-            background: #0a0a0a;
-            min-height: 100vh;
+```html
+<!DOCTYPE html> 
+<html lang="fr"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Regarder - Jerry's Cinema</title> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <style> 
+        .watch-container { 
+            max-width: 100%; 
+            background: #0a0a0a; 
+            min-height: 100vh; 
+        } 
+ 
+        .video-player { 
+            position: relative; 
+            width: 100%; 
+            height: 600px; 
+            background: #000; 
         }
 
-        .video-player {
-            width: 100%;
-            height: 600px;
+        .start-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: #000;
         }
 
-        .watch-info {
-            padding: 30px;
-            color: #fff;
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
+        .start-button {
+            border: none;
+            padding: 16px 30px;
             background: #ff6b35;
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
         }
 
-        .back-button:hover {
+        .start-button:hover {
             background: #ff5722;
+            transform: scale(1.05);
         }
 
-        @media (max-width: 768px) {
-            .video-player {
-                height: 300px;
-            }
-
-            .watch-info {
-                padding: 20px;
-            }
+        .video-player iframe {
+            display: block;
         }
-    </style>
-</head>
-<body class="watch-container">
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">🎬 Jerry's Cinema</div>
-            <a href="/" class="back-button">← Retour</a>
+ 
+        .watch-info { 
+            padding: 30px; 
+            color: #fff; 
+        } 
+ 
+        .back-button { 
+            display: inline-block; 
+            margin-bottom: 20px; 
+            padding: 10px 20px; 
+            background: #ff6b35; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            transition: background 0.3s; 
+        } 
+ 
+        .back-button:hover { 
+            background: #ff5722; 
+        } 
+ 
+        @media (max-width: 768px) { 
+            .video-player { 
+                height: 300px; 
+            } 
+ 
+            .watch-info { 
+                padding: 20px; 
+            } 
+        } 
+    </style> 
+</head> 
+<body class="watch-container"> 
+    <!-- Navigation --> 
+    <nav class="navbar"> 
+        <div class="container"> 
+            <div class="logo">🎬 Jerry's Cinema</div> 
+            <a href="/" class="back-button">← Retour</a> 
+        </div> 
+    </nav> 
+ 
+    <!-- Lecteur vidéo Vidcore --> 
+    <div class="video-player" id="videoPlayer">
+
+        <div class="start-overlay" id="startOverlay">
+            <button class="start-button" id="startButton">
+                ▶ Appuyer pour commencer
+            </button>
         </div>
-    </nav>
 
-    <!-- Lecteur vidéo Vidcore -->
-    <div class="video-player">
-        <iframe 
-            src="https://vidcore.org/embed/movie/{{ movie_id }}" 
-            sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen
-            width="100%" 
-            height="100%" 
-            frameborder="0" 
-            allowfullscreen 
-            allow="autoplay; encrypted-media"
-            style="border: none;">
-        </iframe>
-    </div>
+        <iframe  
+            src="https://vidcore.org/embed/movie/{{ movie_id }}"  
+            sandbox="allow-scripts allow-same-origin allow-forms" 
+            width="100%"  
+            height="100%"  
+            frameborder="0"  
+            allowfullscreen  
+            allow="autoplay; encrypted-media; fullscreen" 
+            style="border: none;"> 
+        </iframe> 
+    </div> 
+ 
+    <!-- Infos du film --> 
+    <div class="watch-info"> 
+        <a href="/" class="back-button">← Retour à l'accueil</a> 
+        <h1>Film en cours de lecture</h1> 
+        <p>Profitez de votre film!</p> 
+    </div> 
+ 
+    <footer class="footer"> 
+        <div class="container"> 
+            <p>&copy; 2026 MovieFlix. Powered by TMDB</p> 
+        </div> 
+    </footer> 
+ 
+    <script src="{{ url_for('static', filename='js/popup-blocker.js') }}"></script>
 
-    <!-- Infos du film -->
-    <div class="watch-info">
-        <a href="/" class="back-button">← Retour à l'accueil</a>
-        <h1>Film en cours de lecture</h1>
-        <p>Profitez de votre film!</p>
-    </div>
+    <script>
+        const startButton = document.getElementById('startButton');
+        const startOverlay = document.getElementById('startOverlay');
+        const videoPlayer = document.getElementById('videoPlayer');
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 MovieFlix. Powered by TMDB & Vidcore</p>
-        </div>
-    </footer>
-</body>
+        startButton.addEventListener('click', async function () {
+
+            try {
+                if (videoPlayer.requestFullscreen) {
+                    await videoPlayer.requestFullscreen();
+                } else if (videoPlayer.webkitRequestFullscreen) {
+                    videoPlayer.webkitRequestFullscreen();
+                }
+            } catch (error) {
+                console.log('Le plein écran n’a pas été autorisé.');
+            }
+
+            startOverlay.style.display = 'none';
+        });
+    </script>
+</body> 
 </html>
+```
