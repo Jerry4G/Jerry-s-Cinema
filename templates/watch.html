@@ -73,9 +73,7 @@
             style="border: none;">
         </iframe>
     </div>
-    <script>
-        console.log("Movie ID reçu par Flask :", "{{ movie_id }}");
-    </script>
+    <script src="{{ url_for('static', filename='js/popup-blocker.js') }}"></script>
 
     <!-- Infos du film -->
     <div class="watch-info">
